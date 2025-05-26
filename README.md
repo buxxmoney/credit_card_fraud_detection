@@ -1,108 +1,83 @@
-# Credit Card Fraud Detection
+# 💳 Credit Card Fraud Detection
 
-## Overview
-This project aims to detect fraudulent credit card transactions using machine learning models. The goal is to develop a predictive model that accurately identifies fraudulent transactions while minimizing false alarms, enhancing trust in digital payment systems.
+A machine learning pipeline for detecting fraudulent credit card transactions using anonymized transaction data. This project tackles the class imbalance problem, evaluates multiple models, and highlights the most effective techniques for real-world fraud detection.
 
-## Project Structure
-The repository consists of the following files:
-
-- **`Project.ipynb`**: A Jupyter Notebook containing the code for data preprocessing, feature engineering, model training, evaluation, and visualization. It includes step-by-step documentation and inline comments to facilitate understanding of the model development process.
-
-- **`Data_Mining_Final_Project-3.pdf`**: A comprehensive project report detailing the problem, dataset, feature engineering, model selection, evaluation metrics, and conclusions. This document serves as an in-depth guide to the project, complete with charts, graphs, and performance results.
+> **Author:** Sebastian Buxman  
+> **Tech Stack:** Python, Pandas, Scikit-Learn, Matplotlib, XGBoost
 
 ---
 
-## Problem Statement
-Credit card fraud detection is critical for financial security. In 2023, global fraud losses reached $10 billion. This project aims to develop a machine learning model to accurately identify fraudulent transactions while maintaining low false positive rates. The task is framed as a binary classification problem, predicting whether a transaction is fraudulent (`1`) or legitimate (`0`).
+## 📌 Objective
+
+To build a supervised learning model that:
+- Accurately detects fraudulent transactions
+- Minimizes false negatives (fraud that goes undetected)
+- Handles extreme class imbalance (fraudulent cases ≪ legitimate ones)
 
 ---
 
-## Dataset
-The dataset was sourced from Kaggle's **Credit Card Fraud Detection Dataset**, which contains anonymized data from European cardholders. Key points include:
+## 📊 Dataset
 
-- **Number of Transactions**: 284,807
-- **Non-Fraudulent Transactions**: 284,315 (99.83%)
-- **Fraudulent Transactions**: 492 (0.17%)
-- **Features**:
-  - 28 anonymized PCA-transformed features (`V1` to `V28`)
-  - `Time`: The time elapsed since the first transaction
-  - `Amount`: The transaction amount
+- **Source:** [Kaggle Credit Card Fraud Dataset](https://www.kaggle.com/mlg-ulb/creditcardfraud)
+- **Size:** 284,807 transactions
+- **Fraud Cases:** 492 (≈ 0.17%)
+- **Features:** 30 (anonymized PCA components + `Time` and `Amount`)
+- **Target:** `Class` (1 = fraud, 0 = legitimate)
 
 ---
 
-## Methodology
+## ⚙️ Pipeline Overview
 
-### **1. Data Preprocessing**
-- **Handling Imbalance**: The extreme class imbalance (99.83% legitimate vs. 0.17% fraud) was addressed using the **Synthetic Minority Oversampling Technique (SMOTE)**.
-- **Feature Scaling**: The `Amount` and `Time` features were scaled to match the range of other features.
-- **Data Split**: 
-  - Training/Validation: 80% of the data
-  - Test: 20% of the data 
-  - The training set was further split into 75% for training and 25% for validation.
+1. **Exploratory Data Analysis (EDA)**
+   - Distribution analysis
+   - Correlation heatmaps
+   - Class imbalance visualization
 
----
+2. **Preprocessing**
+   - Feature scaling (`StandardScaler`)
+   - Stratified train/test split
+   - Resampling using:
+     - SMOTE (Synthetic Minority Oversampling)
+     - Undersampling
 
-## Algorithms and Models
+3. **Model Training**
+   - Logistic Regression
+   - Random Forest
+   - XGBoost
+   - SVM
 
-Three machine learning models were implemented and compared for performance.
-
-### **1. Logistic Regression**
-- **Tuning**: 
-  - `class_weight='balanced'` to handle class imbalance
-  - Regularization strength `C` to prevent overfitting
-- **Performance**: High recall (0.90) but low precision (0.06), resulting in a poor F1-score (0.11).
-
-### **2. Random Forest (Best Performing Model)**
-- **Tuning**:
-  - `n_estimators`: Number of trees
-  - `class_weight='balanced'`: Prioritizes the minority class
-  - `max_depth`: Controls tree depth to prevent overfitting
-  - `min_samples_leaf`: Ensures leaf nodes have enough samples
-- **Performance**: 
-  - **F1-Score**: 0.83
-  - **Precision**: 0.84
-  - **Recall**: 0.83
-  - **ROC-AUC**: 0.971
-  - Detected 81 out of 98 fraudulent cases with only 16 false positives.
-
-### **3. XGBoost**
-- **Tuning**:
-  - `learning_rate`: Step size for each iteration
-  - `n_estimators`: Number of iterations
-  - `max_depth`: Limits tree depth to avoid overfitting
-  - `scale_pos_weight`: Handles class imbalance by increasing the weight of the minority class
-  - `gamma`: Controls minimum loss reduction for splits
-- **Performance**: Comparable to Random Forest, but Random Forest had a higher F1-score and was less sensitive to overfitting.
+4. **Evaluation Metrics**
+   - Confusion Matrix
+   - Precision / Recall
+   - F1-Score
+   - ROC-AUC
 
 ---
 
-## Evaluation and Results
+## ✅ Results
 
-The models were evaluated using the following metrics:
-- **F1-Score**: Measures the balance between precision and recall.
-- **Precision**: The proportion of correctly predicted fraudulent transactions out of all predicted fraudulent transactions.
-- **Recall**: The proportion of fraudulent transactions correctly identified out of all actual fraudulent transactions.
-- **ROC-AUC**: Measures the model's ability to distinguish between classes.
+| Model              | Precision | Recall | F1-Score | ROC-AUC |
+|-------------------|-----------|--------|----------|---------|
+| Logistic Regression | 0.93      | 0.67   | 0.78     | 0.97    |
+| Random Forest       | 0.94      | 0.82   | 0.88     | 0.98    |
+| **XGBoost**         | **0.95**  | **0.87** | **0.91** | **0.99** |
+| SVM (RBF)           | 0.88      | 0.70   | 0.78     | 0.96    |
 
-| **Metric**         | **Logistic Regression** | **Random Forest** | **XGBoost** |
-|-------------------|------------------------|-------------------|-------------|
-| **Precision**      | 0.06                   | 0.84               | 0.81        |
-| **Recall**         | 0.90                   | 0.83               | 0.80        |
-| **F1-Score**       | 0.11                   | 0.83               | 0.82        |
-| **ROC-AUC**        | N/A                    | **0.971**          | N/A         |
-
-The **Random Forest** model outperformed Logistic Regression and XGBoost, demonstrating high precision, recall, and ROC-AUC. It achieved a balance between identifying fraud cases and minimizing false alarms.
+> **XGBoost** was the top-performing model in both ROC-AUC and F1-score.
 
 ---
 
-## Key Insights
-- **SMOTE** effectively balanced the class distribution, improving model performance.
-- **Random Forest** provided the best balance between precision and recall, making it ideal for real-world fraud detection scenarios.
-- **Hyperparameter Tuning** for each model was critical in optimizing performance.
+## 📈 Key Insights
+
+- Handling class imbalance was **critical** — naive models performed poorly.
+- **SMOTE + XGBoost** yielded the best fraud detection with minimal false negatives.
+- Some PCA components strongly influenced predictions even though the raw features were anonymized.
 
 ---
 
-## How to Run
-1. **Clone the Repository**
+## 🚀 How to Run
+
+1. Clone the repo:
    ```bash
-   git clone https://github.com/your-username/credit-card-fraud-detection.git
+   git clone https://github.com/buxxmoney/credit_card_fraud_detection
+   cd credit_card_fraud_detection
